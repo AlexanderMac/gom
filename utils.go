@@ -3,7 +3,6 @@ package gom
 import (
 	"errors"
 	"os"
-	"slices"
 	"strings"
 )
 
@@ -51,7 +50,14 @@ func getMigrationContentByType(mContent string, mType int) string {
 func diff[T comparable](ssA, ssB []T, diffing func([]T, T) bool) []T {
 	if diffing == nil {
 		diffing = func(ss []T, v T) bool {
-			return !slices.Contains(ss, v)
+			index := -1
+			for i := range ss {
+				if ss[i] == v {
+					index = i
+					break
+				}
+			}
+			return index == -1
 		}
 	}
 
