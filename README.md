@@ -7,8 +7,12 @@
 Gom is a database migration tool, it uses embedding SQL migrations. Requires Go v1.16 or higher.
 
 ### Features
-TODO
-- Golang v1.21
+- Supports SQLite
+- CLI
+- Embedded migrations
+- Plain SQL for writing schema migrations
+- Incremental migration version using timestamps
+- Run migrations inside a transaction
 
 ### Install
 ```sh
