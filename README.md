@@ -1,8 +1,14 @@
-# gom
-
-[![Build Status](https://github.com/AlexanderMac/gom/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexanderMac/gom/actions/workflows/ci.yml)
-[![MIT license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
-[![GoDoc](https://pkg.go.dev/badge/github.com/alexandermac/gom)](https://pkg.go.dev/github.com/alexandermac/gom)
+<p align="center">
+  <h1 align="center">gom</h1>
+  <p align="center">A database migration tool for Go.</p>
+  <p align="center">
+    <a href="https://github.com/alexandermac/gom/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://github.com/alexandermac/gom/actions/workflows/ci.yml/badge.svg" alt="Build Status"></a>
+    <a href="https://goreportcard.com/report/github.com/alexandermac/gom"><img src="https://goreportcard.com/badge/github.com/alexandermac/gom" alt="Go Report Card"></a>
+    <a href="https://pkg.go.dev/github.com/alexandermac/gom"><img src="https://pkg.go.dev/badge/github.com/alexandermac/gom.svg" alt="Go Docs"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/github/license/alexandermac/gom.svg" alt="License"></a>
+    <a href="https://img.shields.io/github/v/tag/alexandermac/gom"><img src="https://img.shields.io/github/v/tag/alexandermac/gom" alt="GitHub tag"></a>
+  </p>
+</p>
 
 Gom is a database migration tool, it uses embedding SQL migrations. Requires Go v1.16 or higher.
 
