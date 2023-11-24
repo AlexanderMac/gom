@@ -28,6 +28,11 @@ func main() {
 	}
 	args := flags.Args()
 
+	if len(args) < 1 {
+		flags.Usage()
+		os.Exit(1)
+	}
+
 	firstArg := args[0]
 	switch firstArg {
 	case "help":
