@@ -5,14 +5,14 @@ import (
 )
 
 func Rollback(db *sqlx.DB) error {
-	logger.Info("Rollback last migration")
+	logger.Info("Rollback")
 
 	lastDbMigration, err := getLastDbMigration(db)
 	if err != nil {
 		return err
 	}
 	if lastDbMigration.Name == "" {
-		logger.Info("No migrations to rollback\n")
+		logger.Info("No migrations to rollback")
 		return nil
 	}
 
@@ -25,7 +25,7 @@ func Rollback(db *sqlx.DB) error {
 		return err
 	}
 	rollingBackMigration.fileContent = fileContent
-	logger.Infof("Rolling back migration, %s...\n", rollingBackMigration.name)
+	logger.Infof("Rolling back migration: %s...", rollingBackMigration.name)
 
 	err = rollbackMigration(db, rollingBackMigration)
 	return err

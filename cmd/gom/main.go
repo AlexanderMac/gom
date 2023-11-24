@@ -13,10 +13,12 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+const VERSION = "0.1.1"
+
 func main() {
 	flags := flag.NewFlagSet("gom", flag.ExitOnError)
 	flags.Usage = usage
-	help := flags.Bool("help", false, "Show help")
+	verbose := flags.Bool("verbose", false, "")
 	dir := flags.String("dir", gom.DefaultMigrationsDir, "Migrations directory")
 	name := flags.String("name", "", "New migration name")
 
@@ -26,10 +28,16 @@ func main() {
 	}
 	args := flags.Args()
 
-	if *help {
+	firstArg := args[0]
+	switch firstArg {
+	case "help":
 		flags.Usage()
 		os.Exit(0)
+	case "version":
+		fmt.Printf("v%s\n", VERSION)
+		os.Exit(0)
 	}
+
 	if len(args) < 3 {
 		flags.Usage()
 		os.Exit(1)
@@ -53,6 +61,9 @@ func main() {
 	defer db.Close()
 
 	gom.SetMigrationsDir(*dir)
+	if *verbose {
+		gom.SetDefLogLevel(gom.LOG_LEVEL_DEBUG)
+	}
 
 	switch command {
 	case "init":
@@ -81,27 +92,29 @@ func main() {
 }
 
 func usage() {
-	const usagePrefix = `Usage: gom [OPTIONS] DRIVER DBSTRING COMMAND
+	const usagePrefix = `Usage: gom [FLAGS] DRIVER DBSTRING COMMAND
+
+Flags:
+  --dir                Migrations directory name (absolute or relative path)
+  --name               A new migration file suffix
+  --verbose            Prints debug information
+
+Drivers:
+  sqlite3
 
 Commands:
+  help                 Shows this help
+  version              Prints app version
   init                 Creates the migration directory with a sample migration file and the migrations table in the database
   create               Creates a new migration file
   migrate              Migrates the DB to the most recent version available
   rollback             Roll backs the version by 1
 
-Drivers:
-  sqlite3
-
-Options:
-  --dir                Migrations directory name (absolute or relative path)
-  --name               A new migration file suffix
-
 Examples:
-  gom -dir db_migrations sqlite3 ./foo.db init
-  gom -name create_table sqlite3 ./foo.db create
+  gom --dir db_migrations sqlite3 ./foo.db init
+  gom --dir db_migrations --name create_users sqlite3 ./foo.db create
   gom sqlite3 ./foo.db migrate
   gom sqlite3 ./foo.db rollback
-
 `
 
 	fmt.Print(usagePrefix)

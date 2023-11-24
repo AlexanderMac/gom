@@ -8,7 +8,7 @@ import (
 )
 
 func Migrate(db *sqlx.DB) error {
-	logger.Info("Run pending migrations")
+	logger.Info("Migrate")
 
 	fileUpMigrations, err := getUpFileMigrations()
 	if err != nil {
@@ -28,10 +28,10 @@ func Migrate(db *sqlx.DB) error {
 	})
 	migrationsDiff := diff(fileMigrationNames, dbMigrationNames, nil)
 	if len(migrationsDiff) == 0 {
-		logger.Info("No pending migrations\n")
+		logger.Info("No pending migrations")
 		return nil
 	}
-	logger.Infof("Pending migrations, %v\n", migrationsDiff)
+	logger.Infof("Pending migrations: %v", migrationsDiff)
 
 	pendingMigrations := make([]_FileMigration, len(migrationsDiff))
 	for i := range migrationsDiff {
@@ -90,7 +90,7 @@ ORDER BY 1
 func runMigrations(db *sqlx.DB, pendingMigrations []_FileMigration) error {
 	for i := range pendingMigrations {
 		runningMigration := pendingMigrations[i]
-		logger.Infof("Running migration %s...\n", runningMigration.name)
+		logger.Infof("Running migration: %s...", runningMigration.name)
 		err := runSingleMigration(db, runningMigration)
 		if err != nil {
 			return err

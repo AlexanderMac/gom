@@ -23,6 +23,6 @@ func Create(dir, name, content string) error {
 		return err
 	}
 
-	logger.Infof("Created a new migration file %s\n", filePath)
+	logger.Infof("Created a new migration file: %s", filePath)
 	return nil
 }

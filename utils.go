@@ -3,11 +3,12 @@ package gom
 import (
 	"errors"
 	"os"
+	"path"
 	"strings"
 )
 
 func readFileMigrationContent(fileMigration *_FileMigration, mType int) (string, error) {
-	mContent, err := baseFS.ReadFile(fileMigration.fileName)
+	mContent, err := baseFS.ReadFile(path.Join(migrationsDir, fileMigration.fileName))
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return "", nil
@@ -22,13 +23,13 @@ func readFileMigrationContent(fileMigration *_FileMigration, mType int) (string,
 func getMigrationContentByType(mContent string, mType int) string {
 	hasUp := strings.Contains(mContent, upComment)
 	hasDown := strings.Contains(mContent, downComment)
-	logger.Debugf("Getting content for type=%d, hasUp=%v, hasDown=%v\n", mType, hasUp, hasDown)
+	logger.Debugf("Getting content for type=%d, hasUp=%v, hasDown=%v", mType, hasUp, hasDown)
 
 	if mType == upMigrationType {
 		if hasUp {
 			if hasDown {
 				parts := strings.Split(mContent, downComment)
-				logger.Debugf("Getting content for down, parts=%v\n", parts)
+				logger.Debugf("Getting content for down, parts=%v", parts)
 				return parts[0]
 			}
 			return mContent
@@ -37,7 +38,7 @@ func getMigrationContentByType(mContent string, mType int) string {
 		if hasDown {
 			if hasUp {
 				parts := strings.Split(mContent, downComment)
-				logger.Debugf("Getting content for up, parts=%v\n", parts)
+				logger.Debugf("Getting content for up, parts=%v", parts)
 				return parts[1]
 			}
 			return mContent

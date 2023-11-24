@@ -30,24 +30,27 @@ go install github.com/alexandermac/gom/cmd/gom
 
 ##### CLI
 ```
-gom [OPTIONS] DRIVER DBSTRING COMMAND
+gom [FLAGS] DRIVER DBSTRING COMMAND
+
+Flags:
+  --dir                Migrations directory name (absolute or relative path)
+  --name               A new migration file suffix
+  --verbose            Prints debug information
+
+Drivers:
+  sqlite3
 
 Commands:
+  help                 Shows this help
+  version              Prints app version
   init                 Creates the migration directory with a sample migration file and the migrations table in the database
   create               Creates a new migration file
   migrate              Migrates the DB to the most recent version available
   rollback             Roll backs the version by 1
 
-Drivers:
-  sqlite3
-
-Options:
-  --dir                Migrations directory name (absolute or relative path)
-  --name               A new migration file suffix
-
 Examples:
-  gom -dir db_migrations sqlite3 ./foo.db init
-  gom -name create_table sqlite3 ./foo.db create
+  gom --dir db_migrations sqlite3 ./foo.db init
+  gom --dir db_migrations --name create_users sqlite3 ./foo.db create
   gom sqlite3 ./foo.db migrate
   gom sqlite3 ./foo.db rollback
 ```
