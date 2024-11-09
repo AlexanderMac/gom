@@ -1,34 +1,43 @@
-<p align="center">
-  <h1 align="center">gom</h1>
-  <p align="center">A database migration tool for Go.</p>
-  <p align="center">
+<div align="center">
+  <h1>gom</h1>
+  <p>A database migration tool for Go</p>
+  <p>
     <a href="https://github.com/alexandermac/gom/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://github.com/alexandermac/gom/actions/workflows/ci.yml/badge.svg" alt="Build Status"></a>
     <a href="https://goreportcard.com/report/github.com/alexandermac/gom"><img src="https://goreportcard.com/badge/github.com/alexandermac/gom" alt="Go Report Card"></a>
     <a href="https://pkg.go.dev/github.com/alexandermac/gom"><img src="https://pkg.go.dev/badge/github.com/alexandermac/gom.svg" alt="Go Docs"></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/alexandermac/gom.svg" alt="License"></a>
     <a href="https://img.shields.io/github/v/tag/alexandermac/gom"><img src="https://img.shields.io/github/v/tag/alexandermac/gom" alt="GitHub tag"></a>
   </p>
-</p>
+</div>
 
 Gom is a database migration tool, it uses embedding SQL migrations. Requires Go v1.16 or higher.
 
-### Features
+# Contents
+- [Contents](#contents)
+- [Features](#features)
+- [Install](#install)
+- [Usage](#usage)
+- [API](#api)
+- [License](#license)
+
+# Features
 - Supports SQLite
 - CLI
 - Embedded migrations
 - Plain SQL for writing schema migrations
 - Incremental migration version using timestamps
 - Run migrations inside a transaction
+- Works in Go v1.18+
 
-### Install
+# Install
 ```sh
 # To install the gom binary to your $GOPATH/bin directory
 go install github.com/alexandermac/gom/cmd/gom
 ```
 
-### Usage
+# Usage
 
-##### CLI
+## CLI
 ```
 gom [FLAGS] DRIVER DBSTRING COMMAND
 
@@ -55,7 +64,7 @@ Examples:
   gom sqlite3 ./foo.db rollback
 ```
 
-##### Embedded migrations
+## Embedded migrations
 
 It's possible to embed sql files into binary and corresponding filesystem abstraction. Such migrations can be applied when the app starts.
 ```go
@@ -83,28 +92,28 @@ func main() {
 }
 ```
 
-### API
+# API
 
-##### `func SetBaseFS(fsys simpleFS)`
+### `func SetBaseFS(fsys simpleFS)`
 Sets a base file system to discover migrations. Call this function to pass an embedded migrations variable.
 
-##### `func SetMigrationsDir(dir string)`
+### `func SetMigrationsDir(dir string)`
 Sets the migrations directory.
 
-##### `func SetLogger(l Logger)`
+### `func SetLogger(l Logger)`
 Sets the logger. Must be compatible with gom.Logger interface.
 
-##### `func Create(dir, name, content string) error`
+### `func Create(dir, name, content string) error`
 Creates a new migration file. Used in CLI tool.
 
-##### `func Migrate(db *sqlx.DB) error`
+### `func Migrate(db *sqlx.DB) error`
 Migrates the DB to the most recent version available.
 
-##### `func Rollback(db *sqlx.DB) error`
+### `func Rollback(db *sqlx.DB) error`
 Roll backs the version by 1.
 
-### License
+# License
 Licensed under the MIT license.
 
-### Author
+# Author
 Alexander Mac
