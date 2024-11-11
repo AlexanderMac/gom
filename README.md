@@ -31,7 +31,7 @@ Gom is a database migration tool, it uses embedding SQL migrations. Requires Go 
 
 # Install
 ```sh
-# To install the gom binary to your $GOPATH/bin directory
+# Install the gom binary in your $GOPATH/bin directory
 go install github.com/alexandermac/gom/cmd/gom
 ```
 
