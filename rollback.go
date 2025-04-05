@@ -1,11 +1,13 @@
 package gom
 
-import (
-	"github.com/jmoiron/sqlx"
-)
+import "database/sql"
 
-func Rollback(db *sqlx.DB) error {
+func Rollback(db *sql.DB) error {
 	logger.Info("Rollback")
+
+	if err := createMigrationsTableIfNeeded(db); err != nil {
+		return err
+	}
 
 	lastDbMigration, err := getLastDbMigration(db)
 	if err != nil {
@@ -25,48 +27,56 @@ func Rollback(db *sqlx.DB) error {
 		return err
 	}
 	rollingBackMigration.fileContent = fileContent
-	logger.Infof("Rolling back migration: %s...", rollingBackMigration.name)
 
-	err = rollbackMigration(db, rollingBackMigration)
-	return err
+	return rollbackMigration(db, rollingBackMigration)
 }
 
-func getLastDbMigration(db *sqlx.DB) (_DbMigration, error) {
-	var dbMigrations []_DbMigration
-	err := db.Select(&dbMigrations, `
+func getLastDbMigration(db *sql.DB) (_DbMigration, error) {
+	var dbLastMigration _DbMigration
+	rows, err := db.Query(`
 SELECT name
 FROM migrations
 ORDER BY 1 DESC
 LIMIT 1
 	`)
 	if err != nil {
-		return _DbMigration{}, err
+		return dbLastMigration, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&dbLastMigration.Name)
+		if err != nil {
+			return dbLastMigration, err
+		}
+		break //nolint:golint,staticcheck
+	}
+	if err = rows.Err(); err != nil {
+		return dbLastMigration, err
 	}
 
-	if len(dbMigrations) > 0 {
-		return dbMigrations[0], nil
-	}
-	return _DbMigration{}, nil
+	return dbLastMigration, nil
 }
 
-func rollbackMigration(db *sqlx.DB, rollingBackMigration _FileMigration) error {
-	tx, err := db.Beginx()
+func rollbackMigration(db *sql.DB, rollingBackMigration _FileMigration) error {
+	logger.Infof("Rolling back migration: %s...", rollingBackMigration.name)
+
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback() //nolint:golint,errcheck
 
 	if rollingBackMigration.fileContent != "" {
-		_, err = tx.Exec(rollingBackMigration.fileContent)
-		if err != nil {
+		if _, err = tx.Exec(rollingBackMigration.fileContent); err != nil {
 			return err
 		}
 	}
 
-	_, err = tx.NamedExec(`
+	_, err = tx.Exec(`
 DELETE FROM migrations
-WHERE name = :name
-	`, _DbMigration{Name: rollingBackMigration.name})
+WHERE name = ?
+	`, rollingBackMigration.name)
 	if err != nil {
 		return err
 	}

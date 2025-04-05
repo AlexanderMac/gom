@@ -47,7 +47,7 @@ Flags:
   --verbose            Prints debug information
 
 Drivers:
-  sqlite3
+  sqlite
 
 Commands:
   help                 Shows this help
@@ -58,10 +58,10 @@ Commands:
   rollback             Roll backs the version by 1
 
 Examples:
-  gom --dir db_migrations sqlite3 ./foo.db init
-  gom --dir db_migrations --name create_users sqlite3 ./foo.db create
-  gom sqlite3 ./foo.db migrate
-  gom sqlite3 ./foo.db rollback
+  gom --dir db_migrations sqlite ./foo.db init
+  gom --dir db_migrations --name create_users sqlite ./foo.db create
+  gom sqlite ./foo.db migrate
+  gom sqlite ./foo.db rollback
 ```
 
 ## Embedded migrations
@@ -106,10 +106,10 @@ Sets the logger. Must be compatible with gom.Logger interface.
 ### `func Create(dir, name, content string) error`
 Creates a new migration file. Used in CLI tool.
 
-### `func Migrate(db *sqlx.DB) error`
+### `func Migrate(db *sql.DB) error`
 Migrates the DB to the most recent version available.
 
-### `func Rollback(db *sqlx.DB) error`
+### `func Rollback(db *sql.DB) error`
 Roll backs the version by 1.
 
 # License

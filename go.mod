@@ -2,10 +2,7 @@ module github.com/alexandermac/gom
 
 go 1.21
 
-require (
-	github.com/jmoiron/sqlx v1.3.5
-	modernc.org/sqlite v1.25.0
-)
+require modernc.org/sqlite v1.25.0
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

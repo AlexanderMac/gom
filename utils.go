@@ -1,11 +1,22 @@
 package gom
 
 import (
+	"database/sql"
 	"errors"
 	"os"
 	"path"
 	"strings"
 )
+
+func createMigrationsTableIfNeeded(db *sql.DB) error {
+	_, err := db.Exec(`
+CREATE TABLE IF NOT EXISTS migrations (
+  name text NOT NULL PRIMARY KEY,
+  applied_at text NOT NULL
+) WITHOUT ROWID;
+	`)
+	return err
+}
 
 func readFileMigrationContent(fileMigration *_FileMigration, mType int) (string, error) {
 	mContent, err := baseFS.ReadFile(path.Join(migrationsDir, fileMigration.fileName))

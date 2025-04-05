@@ -18,8 +18,7 @@ func Create(dir, name, content string) error {
 		content = newMigrationContent
 	}
 
-	err := os.WriteFile(filePath, []byte(content), 0644)
-	if err != nil {
+	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
 		return err
 	}
 

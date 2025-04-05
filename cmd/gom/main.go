@@ -8,12 +8,13 @@ import (
 	"log"
 	"os"
 
+	"database/sql"
+
 	"github.com/alexandermac/gom"
-	"github.com/jmoiron/sqlx"
 	_ "modernc.org/sqlite"
 )
 
-const VERSION = "0.1.1"
+const VERSION = "0.2.0"
 
 func main() {
 	flags := flag.NewFlagSet("gom", flag.ExitOnError)
@@ -52,14 +53,14 @@ func main() {
 	dbString := args[1]
 	command := args[2]
 
-	if dbDriver != "sqlite3" {
-		log.Fatal("Unsupported dbDriver, gom supports sqlite3 driver only")
+	if dbDriver != "sqlite" {
+		log.Fatal("Unsupported dbDriver, gom supports sqlite driver only")
 	}
 	if dbString == "" {
 		log.Fatal("dbString must be provided")
 	}
 
-	db, err := connectDatabase(dbString)
+	db, err := connectDatabase(dbDriver, dbString)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -94,6 +95,7 @@ func main() {
 	default:
 		log.Fatalf("Unknown command: %s", command)
 	}
+	log.Println("Done")
 }
 
 func usage() {
@@ -105,7 +107,7 @@ Flags:
   --verbose            Prints debug information
 
 Drivers:
-  sqlite3
+  sqlite
 
 Commands:
   help                 Shows this help
@@ -116,33 +118,33 @@ Commands:
   rollback             Roll backs the version by 1
 
 Examples:
-  gom --dir db_migrations sqlite3 ./foo.db init
-  gom --dir db_migrations --name create_users sqlite3 ./foo.db create
-  gom sqlite3 ./foo.db migrate
-  gom sqlite3 ./foo.db rollback
+  gom --dir db_migrations sqlite ./foo.db init
+  gom --dir db_migrations --name create_users sqlite ./foo.db create
+  gom sqlite ./foo.db migrate
+  gom sqlite ./foo.db rollback
 `
 
 	fmt.Print(usagePrefix)
 	flag.PrintDefaults()
 }
 
-func connectDatabase(dbString string) (*sqlx.DB, error) {
-	db, err := sqlx.Connect("sqlite", dbString)
+func connectDatabase(dbDriver string, dbString string) (*sql.DB, error) {
+	db, err := sql.Open(dbDriver, dbString)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = db.Exec(`
-PRAGMA foreign_keys = on;
-	`)
-	if err != nil {
-		return nil, err
+	if dbDriver == "sqlite" {
+		_, err = db.Exec("PRAGMA foreign_keys = on;")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return db, nil
 }
 
-func gomInit(db *sqlx.DB, dir string) error {
+func gomInit(db *sql.DB, dir string) error {
 	const sqlMigrationTemplate = `--
 -- This file was automatically created running gom init. You can delete this file if you're familiar with gom.
 --

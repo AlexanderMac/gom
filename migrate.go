@@ -1,14 +1,17 @@
 package gom
 
 import (
+	"database/sql"
 	"sort"
 	"strings"
-
-	"github.com/jmoiron/sqlx"
 )
 
-func Migrate(db *sqlx.DB) error {
+func Migrate(db *sql.DB) error {
 	logger.Info("Migrate")
+
+	if err := createMigrationsTableIfNeeded(db); err != nil {
+		return err
+	}
 
 	fileUpMigrations, err := getUpFileMigrations()
 	if err != nil {
@@ -45,8 +48,7 @@ func Migrate(db *sqlx.DB) error {
 		pendingMigrations[i].fileContent = fileContent
 	}
 
-	err = runMigrations(db, pendingMigrations)
-	return err
+	return runMigrations(db, pendingMigrations)
 }
 
 func getUpFileMigrations() ([]_FileMigration, error) {
@@ -73,9 +75,9 @@ func getUpFileMigrations() ([]_FileMigration, error) {
 	return fileMigrations, nil
 }
 
-func getDbMigrations(db *sqlx.DB) ([]_DbMigration, error) {
+func getDbMigrations(db *sql.DB) ([]_DbMigration, error) {
 	var dbMigrations []_DbMigration
-	err := db.Select(&dbMigrations, `
+	rows, err := db.Query(`
 SELECT name
 FROM migrations
 ORDER BY 1
@@ -83,16 +85,27 @@ ORDER BY 1
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var m _DbMigration
+		err = rows.Scan(&m.Name)
+		if err != nil {
+			return nil, err
+		}
+		dbMigrations = append(dbMigrations, m)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 
 	return dbMigrations, nil
 }
 
-func runMigrations(db *sqlx.DB, pendingMigrations []_FileMigration) error {
+func runMigrations(db *sql.DB, pendingMigrations []_FileMigration) error {
 	for i := range pendingMigrations {
 		runningMigration := pendingMigrations[i]
-		logger.Infof("Running migration: %s...", runningMigration.name)
-		err := runSingleMigration(db, runningMigration)
-		if err != nil {
+		if err := runSingleMigration(db, runningMigration); err != nil {
 			return err
 		}
 	}
@@ -100,22 +113,22 @@ func runMigrations(db *sqlx.DB, pendingMigrations []_FileMigration) error {
 	return nil
 }
 
-func runSingleMigration(db *sqlx.DB, pendingMigration _FileMigration) error {
-	tx, err := db.Beginx()
+func runSingleMigration(db *sql.DB, runningMigration _FileMigration) error {
+	logger.Infof("Running migration: %s...", runningMigration.name)
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback() //nolint:golint,errcheck
 
-	_, err = tx.Exec(pendingMigration.fileContent)
-	if err != nil {
+	if _, err = tx.Exec(runningMigration.fileContent); err != nil {
 		return err
 	}
 
-	_, err = tx.NamedExec(`
+	_, err = tx.Exec(`
 INSERT INTO migrations (name, applied_at)
-VALUES (:name, datetime())
-	`, _DbMigration{Name: pendingMigration.name})
+VALUES (?, datetime())
+	`, runningMigration.name)
 	if err != nil {
 		return err
 	}
