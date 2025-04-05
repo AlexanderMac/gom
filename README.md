@@ -1,6 +1,6 @@
 <div align="center">
   <h1>gom</h1>
-  <p>A database migration tool for Go</p>
+  <p>A database migration tool for Go applications</p>
   <p>
     <a href="https://github.com/alexandermac/gom/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://github.com/alexandermac/gom/actions/workflows/ci.yml/badge.svg" alt="Build Status"></a>
     <a href="https://goreportcard.com/report/github.com/alexandermac/gom"><img src="https://goreportcard.com/badge/github.com/alexandermac/gom" alt="Go Report Card"></a>
@@ -10,7 +10,7 @@
   </p>
 </div>
 
-Gom is a database migration tool, it uses embedding SQL migrations. Requires Go v1.18 or higher.
+Gom is a database migration tool. Requires Go v1.18 or higher. It can be run as a command-line tool or injected into the application using embedding SQL migrations.
 
 # Contents
 - [Contents](#contents)
