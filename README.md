@@ -10,7 +10,7 @@
   </p>
 </div>
 
-Gom is a database migration tool, it uses embedding SQL migrations. Requires Go v1.16 or higher.
+Gom is a database migration tool, it uses embedding SQL migrations. Requires Go v1.18 or higher.
 
 # Contents
 - [Contents](#contents)

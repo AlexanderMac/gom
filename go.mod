@@ -1,6 +1,6 @@
 module github.com/alexandermac/gom
 
-go 1.21
+go 1.24
 
 require modernc.org/sqlite v1.25.0
 
