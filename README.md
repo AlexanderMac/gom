@@ -31,8 +31,7 @@ Gom is a database migration tool. Requires Go v1.18 or higher. It can be run as 
 
 # Install
 ```sh
-# Install the gom binary in your $GOPATH/bin directory
-go install github.com/alexandermac/gom/cmd/gom
+go install github.com/alexandermac/gom/cmd/gom@latest
 ```
 
 # Usage
